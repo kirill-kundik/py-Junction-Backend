@@ -1,10 +1,17 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Numeric, DateTime
+from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Numeric, DateTime, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
 Base = declarative_base()
+
+wish_list_to_challenge = Table(
+    'wish_list_to_challenge',
+    Base.metadata,
+    Column('wish_list_fk', Integer, ForeignKey('wish_list.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False),
+    Column('challenge_fk', Integer, ForeignKey('challenge.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False)
+)
 
 
 class PeriodType(enum.Enum):
@@ -15,19 +22,40 @@ class PeriodType(enum.Enum):
     yearly = 4
 
 
+class ChallengeDifficulty(enum.Enum):
+    easy = 0
+    medium = 1
+    hard = 2
+    insane = 3
+
+
+class User(Base):
+    __tablename__ = "user"
+
+    id = Column(Integer, primary_key=True)
+    username = Column(String(255), nullable=False, unique=True)
+    email = Column(String, nullable=False)
+    pass_hash = Column(String(64), nullable=False)
+    photo_url = Column(String)
+
+    items = relationship("Item")
+    wish_list = relationship("WishList")
+
+
 class Category(Base):
     __tablename__ = "category"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False, unique=True)
     description = Column(String)
     color = Column(String(10))
 
 
 class SubCategory(Base):
     __tablename__ = "sub_category"
+
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False)
+    name = Column(String(255), nullable=False, unique=True)
     description = Column(String)
     color = Column(String(10))
     period = Column(Enum(PeriodType))
@@ -45,8 +73,51 @@ class Item(Base):
     amount = Column(Integer, nullable=False)
     name = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
+    description = Column(String)
 
     sub_category = relationship("SubCategory")
 
     sub_category_fk = Column(Integer, ForeignKey('sub_category.id', onupdate='CASCADE', ondelete='RESTRICT'),
                              nullable=False)
+    user_fk = Column(Integer, ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
+
+
+class Challenge(Base):
+    __tablename__ = "challenge"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    photo_url = Column(String)
+    full_description = Column(String)
+    brief_description = Column(String)
+    earn_amount = Column(Numeric)
+    difficulty = Column(Enum(ChallengeDifficulty))
+
+    sub_category = relationship("SubCategory")
+    wish_list = relationship(
+        "WishList",
+        secondary=wish_list_to_challenge,
+        back_populates="challenges"
+    )
+
+    sub_category_fk = Column(Integer, ForeignKey('sub_category.id', onupdate='CASCADE', ondelete='CASCADE'),
+                             nullable=False)
+
+
+class WishList(Base):
+    __tablename__ = "wish_list"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False, unique=True)
+    photo_url = Column(String)
+    amount = Column(Numeric)
+    price = Column(Numeric, nullable=False)
+    description = Column(String)
+
+    challenges = relationship(
+        "Challenge",
+        secondary=wish_list_to_challenge,
+        back_populates="wish_list",
+    )
+
+    user_fk = Column(Integer, ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
