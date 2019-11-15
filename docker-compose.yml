@@ -1,0 +1,38 @@
+version: '3.5'
+services:
+  web:
+    image: junction_server_$APP_MODE
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - APP_PORT=$APP_PORT
+    container_name: junction_server_web_$APP_MODE
+    environment:
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_DB
+      - APP_PORT
+    links:
+      - postgres
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - $APP_PORT:$APP_PORT
+
+  postgres:
+    image: postgres:9.6
+    container_name: junction_server_postgres_$APP_MODE
+    environment:
+      - POSTGRES_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_DB
+    ports:
+      - $POSTGRES_EXTERNAL_PORT:$POSTGRES_PORT
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
