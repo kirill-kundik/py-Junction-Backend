@@ -8,7 +8,7 @@ from app.db.exceptions import DatabaseException
 def get_all(from_user):
     items = app.db.get_user_items(from_user["id"])
 
-    return [item.drop() for item in items]
+    return [item.dump() for item in items]
 
 
 def create(item):
