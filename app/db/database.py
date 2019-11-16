@@ -164,7 +164,7 @@ class Database(metaclass=Singleton):
         return items
 
     def add_challenge(self, challenge: Challenge) -> bool:
-        with  self._session_scope() as s:
+        with self._session_scope() as s:
             s.add(challenge)
         return True
 
