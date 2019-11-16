@@ -30,8 +30,9 @@ def create_challenge_on_item_add(item: Item):
                           difficulty=ChallengeDifficulty.easy,
                           sub_category_fk=item.sub_category.id)
     app.db.add_challenge(challenge)
-    user.recommended_challenges.append(challenge)
-    app.db.update_user(user)
+    app.db.add_user_recommended_challenge(user.id, challenge.id)
+    # user.recommended_challenges.append(app.db.get_challenge_by_id(challenge.id))
+    # app.db.update_user(user)
 
 
 if __name__ == "__main__":

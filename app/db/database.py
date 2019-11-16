@@ -322,12 +322,12 @@ class Database(metaclass=Singleton):
                      wish_list_to_challenge.c.challenge_fk == challenge_id)).all()
         return items
 
-    def get_user_items_count(self, user_id) -> int:
+    def get_user_items_count(self, user_id: int) -> int:
         with self._session_scope() as s:
             count = s.query(Item).filter(Item.user_fk == user_id).count()
         return count
 
-    def get_user_items_sum_by_period(self, user_id, period_first_day):
+    def get_user_items_sum_by_period(self, user_id: int, period_first_day):
         with self._session_scope() as s:
             sum_costs = s.query(func.sum(Item.price * Item.amount)).filter(
                 and_(Item.user_fk == user_id, Item.date >= period_first_day)).first()[0]
@@ -337,3 +337,8 @@ class Database(metaclass=Singleton):
         with self._session_scope() as s:
             subcategories = s.query(SubCategory).all()
         return subcategories
+
+    def add_user_recommended_challenge(self, user_fk: int, challenge_fk: int):
+        conn = self.engine.connect()
+        stmt = recommended_challenges.insert().values(user_fk=user_fk, challenge_fk=challenge_fk)
+        conn.execute(stmt)
