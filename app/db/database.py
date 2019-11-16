@@ -2,7 +2,7 @@ from contextlib import contextmanager
 from typing import List
 
 from sqlalchemy import create_engine, or_, and_
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, subqueryload
 
 import app
 from .models import *
@@ -197,8 +197,10 @@ class Database(metaclass=Singleton):
 
     def get_challenges_by_user(self, user_id: int) -> List[Challenge]:
         with self._session_scope() as s:
-            challenges = s.query(Challenge).join(wish_list_to_challenge).join(WishList).join(User).filter(
-                User.id == user_id).all()
+            challenges = s.query(Challenge).join(wish_list_to_challenge).join(WishList).join(User).join(
+                SubCategory) \
+                .options(subqueryload(Challenge.sub_category)) \
+                .filter(User.id == user_id).all()
         return challenges
 
     def get_challenges_by_user_and_category(self, user_id: int, category_id: int) -> List[Challenge]:
