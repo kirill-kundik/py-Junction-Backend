@@ -1,1 +1,1 @@
-from . import challenges, wishlist
+from . import challenges, wishlist, items

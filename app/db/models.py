@@ -119,6 +119,17 @@ class Item(Base):
                              nullable=False)
     user_fk = Column(Integer, ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
 
+    def dump(self):
+        return {
+            "id": self.id,
+            "price": self.price,
+            "amount": self.amount,
+            "name": self.name,
+            "date": self.date,
+            "description": self.description,
+            "sub_category": self.sub_category.dump(),
+        }
+
 
 class Challenge(Base):
     __tablename__ = "challenge"
@@ -158,7 +169,7 @@ class WishList(Base):
     __tablename__ = "wish_list"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     photo_url = Column(String)
     amount = Column(Numeric)
     price = Column(Numeric, nullable=False)
