@@ -13,12 +13,13 @@ produces:
 #  - oauth2: [uid]
 paths:
   /challenges:
-    get:
+    post:
       tags: [Challenges]
       operationId: app.challenges.get_all
       parameters:
-        - in: body
-          name: body
+        - name: from_user
+          in: body
+          required: true
           schema:
             $ref: "#/definitions/FromUserRequest"
       responses:
