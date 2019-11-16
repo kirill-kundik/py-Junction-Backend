@@ -320,3 +320,8 @@ class Database(metaclass=Singleton):
                 and_(wish_list_to_challenge.c.user_fk == user_fk,
                      wish_list_to_challenge.c.challenge_fk == challenge_id)).all()
         return items
+
+    def get_all_subcategories(self) -> List[SubCategory]:
+        with self._session_scope() as s:
+            subcategories = s.query(SubCategory).all()
+        return subcategories
