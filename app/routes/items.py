@@ -13,7 +13,8 @@ def get_all(from_user):
 
 def create(item):
     try:
-        app.db.add_item(Item(**item))
+        new_item = Item(**item)
+        app.db.add_item(new_item)
     except DatabaseException:
         return NoContent, 404
-    return NoContent, 200
+    return new_item.dump()
