@@ -1,26 +1,30 @@
-class UserAlreadyExists(Exception):
+class DatabaseException(Exception):
     pass
 
 
-class UserIsNotExist(Exception):
+class UserAlreadyExistsException(DatabaseException):
     pass
 
 
-class WishListItemIsNotExist(Exception):
+class UserIsNotExistException(DatabaseException):
     pass
 
 
-class ItemIsNotExist(Exception):
+class WishListItemIsNotExistException(DatabaseException):
     pass
 
 
-class ChallengeIsNotExist(Exception):
+class ItemIsNotExistException(DatabaseException):
     pass
 
 
-class SubCategoryIsNotExist(Exception):
+class ChallengeIsNotExistException(DatabaseException):
     pass
 
 
-class CategoryIsNotExist(Exception):
+class SubCategoryIsNotExistException(DatabaseException):
+    pass
+
+
+class CategoryIsNotExistException(DatabaseException):
     pass

@@ -30,17 +30,17 @@ paths:
             items:
               $ref: '#/definitions/Challenge'
 
-  /challenge/apply/{id}:
+  /challenge/apply/{challenge_id}:
     post:
       tags: [Challenges]
       operationId:  app.challenges.apply
       parameters:
         - in: path
-          name: id
+          name: challenge_id
           type: string
           required: true
         - in: body
-          name: body
+          name: from_user
           schema:
             $ref: "#/definitions/FromUserRequest"
       responses:
@@ -48,7 +48,24 @@ paths:
           description: Return updated challenge
           schema:
             $ref: "#/definitions/Challenge"
-
+  /challenge/unapply/{challenge_id}:
+    post:
+      tags: [Challenges]
+      operationId:  app.challenges.unapply
+      parameters:
+        - in: path
+          name: challenge_id
+          type: string
+          required: true
+        - in: body
+          name: from_user
+          schema:
+            $ref: "#/definitions/FromUserRequest"
+      responses:
+        default:
+          description: Return updated challenge
+          schema:
+            $ref: "#/definitions/Challenge"
   /whishlist/all:
     get:
       tags: [Whishlist]
