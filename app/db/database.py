@@ -70,10 +70,10 @@ class Database(metaclass=Singleton):
             # not_updated_user.challenges = user.challenges
         return True
 
-    def add_wish_list_item(self, item: WishList) -> bool:
+    def add_wish_list_item(self, item: WishList) -> WishList:
         with self._session_scope() as s:
             s.add(item)
-        return True
+        return item
 
     def get_wish_list_item(self, item_id: int) -> WishList or WishListItemIsNotExistException:
         with self._session_scope() as s:
