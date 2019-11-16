@@ -113,7 +113,7 @@ class Item(Base):
     date = Column(DateTime, nullable=False)
     description = Column(String)
 
-    sub_category = relationship("SubCategory")
+    sub_category = relationship("SubCategory", lazy="subquery")
 
     sub_category_fk = Column(Integer, ForeignKey('sub_category.id', onupdate='CASCADE', ondelete='RESTRICT'),
                              nullable=False)
