@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, Numeric, DateTime, Table
+from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, String, Table
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
@@ -30,6 +30,20 @@ class PeriodType(enum.Enum):
     monthly = 2
     half_yearly = 3
     yearly = 4
+
+    @property
+    def next(self):
+        new_val = self.value + 1
+        if new_val > 4:
+            raise ValueError("Enum ended")
+        return PeriodType(new_val)
+
+    @property
+    def prev(self):
+        new_val = self.value - 1
+        if new_val < 0:
+            raise ValueError("Enum ended")
+        return PeriodType(new_val)
 
 
 class ChallengeDifficulty(enum.Enum):
@@ -135,7 +149,7 @@ class Challenge(Base):
     __tablename__ = "challenge"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False, unique=True)
+    name = Column(String, nullable=False)
     photo_url = Column(String)
     full_description = Column(String)
     brief_description = Column(String)
