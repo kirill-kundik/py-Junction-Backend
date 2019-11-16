@@ -9,8 +9,10 @@ Base = declarative_base()
 wish_list_to_challenge = Table(
     'wish_list_to_challenge',
     Base.metadata,
-    Column('wish_list_fk', Integer, ForeignKey('wish_list.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False),
-    Column('challenge_fk', Integer, ForeignKey('challenge.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False)
+    Column('wish_list_fk', Integer, ForeignKey('wish_list.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=True),
+    Column('challenge_fk', Integer, ForeignKey('challenge.id', onupdate='CASCADE', ondelete='RESTRICT'),
+           nullable=False),
+    Column('user_fk', Integer, ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 )
 
 
@@ -38,8 +40,13 @@ class User(Base):
     pass_hash = Column(String(64), nullable=False)
     photo_url = Column(String)
 
-    items = relationship("Item")
-    wish_list = relationship("WishList")
+    items = relationship("Item", lazy="dynamic")
+    wish_list = relationship("WishList", lazy="dynamic")
+    challenges = relationship(
+        "Challenge",
+        secondary=wish_list_to_challenge,
+        lazy='subquery',
+    )
 
 
 class Category(Base):
