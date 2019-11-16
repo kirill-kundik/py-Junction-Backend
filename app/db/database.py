@@ -307,9 +307,9 @@ class Database(metaclass=Singleton):
                     and_(WishList.id == wishlist_item_id, WishList.user_fk == user.id)).one_or_none()
                 if item is None:
                     raise WishListItemIsNotExistException
-                conn = self.engine.connect()
-                stmt = wish_list_to_challenge.update().values(wish_list_fk=item.id) \
-                    .where(and_(wish_list_to_challenge.c.challenge_fk == challenge.id,
-                                wish_list_to_challenge.c.user_fk == user.id))
-                conn.execute(stmt)
+        conn = self.engine.connect()
+        stmt = wish_list_to_challenge.update().values(wish_list_fk=item.id) \
+            .where(and_(wish_list_to_challenge.c.challenge_fk == challenge.id,
+                        wish_list_to_challenge.c.user_fk == user.id))
+        conn.execute(stmt)
         return True
