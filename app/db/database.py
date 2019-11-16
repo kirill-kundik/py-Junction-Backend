@@ -173,7 +173,7 @@ class Database(metaclass=Singleton):
 
     def get_challenge_by_id(self, challenge_id: int) -> Challenge or ChallengeIsNotExistException:
         with self._session_scope() as s:
-            check_challenge = s.query(Challenge)\
+            check_challenge = s.query(Challenge) \
                 .options(subqueryload(Challenge.sub_category)) \
                 .filter(Challenge.id == challenge_id).one_or_none()
             if check_challenge is None:
@@ -282,7 +282,7 @@ class Database(metaclass=Singleton):
             categories = s.query(Category).join(SubCategory).join(Item).filter(Item.user_fk == user_id).all()
         return categories
 
-    def unapply_user(self, user_id, challenge_id) -> bool or DatabaseException:
+    def unapply_user(self, user_id: int, challenge_id: int) -> bool or DatabaseException:
         with self._session_scope() as s:
             user = s.query(User).filter(User.id == user_id).one_or_none()
             if user is None:
@@ -293,7 +293,7 @@ class Database(metaclass=Singleton):
             user.challenges.remove(challenge)
         return True
 
-    def apply_user(self, user_id, challenge_id) -> bool or DatabaseException:
+    def apply_user(self, user_id: int, challenge_id: int, wishlist_item_id: int) -> bool or DatabaseException:
         with self._session_scope() as s:
             user = s.query(User).filter(User.id == user_id).one_or_none()
             if user is None:
@@ -302,4 +302,14 @@ class Database(metaclass=Singleton):
             if challenge is None:
                 raise ChallengeIsNotExistException
             user.challenges.append(challenge)
+            if wishlist_item_id is not None:
+                item = s.query(WishList).filter(
+                    and_(WishList.id == wishlist_item_id, WishList.user_fk == user.id)).one_or_none()
+                if item is None:
+                    raise WishListItemIsNotExistException
+                conn = self.engine.connect()
+                stmt = wish_list_to_challenge.update().values(wish_list_fk=item.id) \
+                    .where(and_(wish_list_to_challenge.c.challenge_fk == challenge.id,
+                                wish_list_to_challenge.c.user_fk == user.id))
+                conn.execute(stmt)
         return True
