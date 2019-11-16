@@ -67,7 +67,7 @@ paths:
           schema:
             $ref: "#/definitions/Challenge"
   /whishlist/all:
-    get:
+    post:
       tags: [Wishlist]
       operationId: app.wishlist.get_all
       parameters:
