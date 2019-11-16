@@ -66,7 +66,7 @@ paths:
           description: Return updated challenge
           schema:
             $ref: "#/definitions/Challenge"
-  /whishlist/all:
+  /wishlist/all:
     post:
       tags: [Wishlist]
       operationId: app.wishlist.get_all
@@ -77,7 +77,7 @@ paths:
             $ref: "#/definitions/FromUserRequest"
       responses:
         default:
-          description: Get all whishlist
+          description: Get all wishlist
           schema:
             $ref:  "#/definitions/Wishlist"
 
@@ -115,6 +115,37 @@ paths:
             items:
               $ref:  "#/definitions/Wishlist"
 
+  /items/all:
+    post:
+      tags: [Items]
+      operationId: app.items.get_all
+      parameters:
+        - in: body
+          name: from_user
+          schema:
+            $ref: "#/definitions/FromUserRequest"
+      responses:
+        default:
+          description: Get all user items (spendings)
+          schema:
+            $ref:  "#/definitions/Item"
+
+  /item:
+    post:
+      tags: [Items]
+      operationId: app.items.create
+      parameters:
+        - in: body
+          name: item
+          schema:
+            $ref: "#/definitions/ItemCreateRequest"
+      responses:
+        default:
+          description: Create a new wishlist item
+          schema:
+            type: array
+            items:
+              $ref:  "#/definitions/Item"
 
 
 definitions:
@@ -144,6 +175,26 @@ definitions:
       description:
         type: string
     required: [user_fk, name, price]
+  Item:
+    type: object
+  ItemCreateRequest:
+    type: object
+    properties:
+      price:
+        type: number
+      amount:
+        type: number
+      name:
+        type: string
+      date:
+        type: string
+      sub_category_fk:
+        type: integer
+      user_fk:
+        type: integer
+      description:
+        type: string
+    required: [price, amount, name, date, sub_category_fk, user_fk]
 
 
 
