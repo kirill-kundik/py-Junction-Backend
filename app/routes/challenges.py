@@ -15,7 +15,7 @@ def get_all(from_user):
 
 def apply(challenge_id, from_user):
     try:
-        app.db.apply_user(from_user["id"], challenge_id)
+        app.db.apply_user(from_user["id"], challenge_id, from_user["wishlist_id"])
     except DatabaseException:
         return NoContent, 404
     return {**app.db.get_challenge_by_id(challenge_id).dump(), "applied": True}

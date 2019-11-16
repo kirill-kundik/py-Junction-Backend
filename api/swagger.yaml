@@ -42,7 +42,7 @@ paths:
         - in: body
           name: from_user
           schema:
-            $ref: "#/definitions/FromUserRequest"
+            $ref: "#/definitions/ChallengeApplyRequest"
       responses:
         default:
           description: Return updated challenge
@@ -149,6 +149,14 @@ paths:
 
 
 definitions:
+  ChallengeApplyRequest:
+    type: object
+    properties:
+      id:
+        type: number
+      wishlist_id:
+        type: number
+    required: [id]
   FromUserRequest:
     type: object
     properties:
