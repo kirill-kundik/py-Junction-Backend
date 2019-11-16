@@ -27,28 +27,28 @@ class Database(metaclass=Singleton):
         finally:
             session.close()
 
-    def add_user(self, user: User) -> bool or UserAlreadyExists:
+    def add_user(self, user: User) -> bool or UserAlreadyExistsException:
         with self._session_scope() as s:
             check_user = s.query(User).filter(
                 or_(User.username == user.username, User.email == user.email)).one_or_none()
             if check_user is not None:
                 s.add(user)
             else:
-                raise UserAlreadyExists
+                raise UserAlreadyExistsException
             return True
 
-    def get_user_by_id(self, user_id: int) -> User or UserIsNotExist:
+    def get_user_by_id(self, user_id: int) -> User or UserIsNotExistException:
         with self._session_scope() as s:
             user = s.query(User).filter(User.id == user_id).one_or_none()
             if user is None:
-                raise UserIsNotExist
+                raise UserIsNotExistException
         return user
 
-    def get_user_by_username(self, username: str) -> User or UserIsNotExist:
+    def get_user_by_username(self, username: str) -> User or UserIsNotExistException:
         with self._session_scope() as s:
             user = s.query(User).filter(User.username == username).one_or_none()
             if user is None:
-                raise UserIsNotExist
+                raise UserIsNotExistException
         return user
 
     def get_all_users(self) -> List[User]:
@@ -56,17 +56,18 @@ class Database(metaclass=Singleton):
             users = s.query(User).all()
         return users
 
-    def update_user(self, user: User) -> bool or UserIsNotExist:
+    def update_user(self, user: User) -> bool or UserIsNotExistException:
         with self._session_scope() as s:
             not_updated_user: User = s.query(User).filter(User.id == user.id).one_or_none()
             if not_updated_user is None:
-                raise UserIsNotExist
+                raise UserIsNotExistException
             not_updated_user.username = user.username
             not_updated_user.email = user.email
             not_updated_user.items = user.items
             not_updated_user.pass_hash = user.pass_hash
             not_updated_user.photo_url = user.photo_url
             not_updated_user.wish_list = user.wish_list
+            not_updated_user.challenges = user.challenges
         return True
 
     def add_wish_list_item(self, item: WishList) -> bool:
@@ -74,18 +75,18 @@ class Database(metaclass=Singleton):
             s.add(item)
         return True
 
-    def get_wish_list_item(self, item_id: int) -> WishList or WishListItemIsNotExist:
+    def get_wish_list_item(self, item_id: int) -> WishList or WishListItemIsNotExistException:
         with self._session_scope() as s:
             check_item = s.query(WishList).filter(WishList.id == item_id).one_or_nonne()
             if check_item is None:
-                raise WishListItemIsNotExist
+                raise WishListItemIsNotExistException
         return check_item
 
-    def update_wish_list_item(self, item: WishList) -> bool or WishListItemIsNotExist:
+    def update_wish_list_item(self, item: WishList) -> bool or WishListItemIsNotExistException:
         with self._session_scope() as s:
             not_updated_item: WishList = s.query(WishList).filter(WishList.id == item.id).one_or_none()
             if not_updated_item is None:
-                raise WishListItemIsNotExist
+                raise WishListItemIsNotExistException
             not_updated_item.photo_url = item.photo_url
             not_updated_item.name = item.name
             not_updated_item.description = item.description
@@ -94,11 +95,11 @@ class Database(metaclass=Singleton):
             not_updated_item.price = item.price
         return True
 
-    def delete_wish_list_item(self, item: WishList) -> bool or WishListItemIsNotExist:
+    def delete_wish_list_item(self, item: WishList) -> bool or WishListItemIsNotExistException:
         with self._session_scope() as s:
             check_item = s.query(WishList).filter(WishList.id == item.id).one_or_none()
             if check_item is None:
-                raise WishListItemIsNotExist
+                raise WishListItemIsNotExistException
             s.query(WishList).filter(WishList.id == item.id).delete(synchronize_session=False)
         return True
 
@@ -118,18 +119,18 @@ class Database(metaclass=Singleton):
             s.add(item)
         return True
 
-    def get_item(self, item_id: int) -> Item or ItemIsNotExist:
+    def get_item(self, item_id: int) -> Item or ItemIsNotExistException:
         with self._session_scope() as s:
             check_item = s.query(Item).filter(Item.id == item_id).one_or_none()
             if check_item is None:
-                raise ItemIsNotExist
+                raise ItemIsNotExistException
         return check_item
 
-    def update_item(self, item: Item) -> bool or ItemIsNotExist:
+    def update_item(self, item: Item) -> bool or ItemIsNotExistException:
         with self._session_scope() as s:
             not_updated_item: Item = s.query(Item).filter(Item.id == item.id).one_or_none()
             if not_updated_item is None:
-                raise ItemIsNotExist
+                raise ItemIsNotExistException
             not_updated_item.price = item.price
             not_updated_item.amount = item.amount
             not_updated_item.description = item.description
@@ -138,11 +139,11 @@ class Database(metaclass=Singleton):
             not_updated_item.sub_category_fk = item.sub_category_fk
         return True
 
-    def delete_item(self, item: Item) -> bool or ItemIsNotExist:
+    def delete_item(self, item: Item) -> bool or ItemIsNotExistException:
         with self._session_scope() as s:
             check_item = s.query(Item).filter(Item.id == item.id).one_or_none()
             if check_item is None:
-                raise ItemIsNotExist
+                raise ItemIsNotExistException
             s.query(Item).filter(Item.id == item.id).delete(synchronize_session=False)
         return True
 
@@ -168,18 +169,18 @@ class Database(metaclass=Singleton):
             s.add(challenge)
         return True
 
-    def get_challenge_by_id(self, challenge_id: int) -> Challenge or ChallengeIsNotExist:
+    def get_challenge_by_id(self, challenge_id: int) -> Challenge or ChallengeIsNotExistException:
         with self._session_scope() as s:
             check_challenge = s.query(Challenge).filter(Challenge.id == challenge_id).one_or_none()
             if check_challenge is None:
-                raise ChallengeIsNotExist
+                raise ChallengeIsNotExistException
         return check_challenge
 
-    def update_challenge(self, challenge: Challenge) -> bool or ChallengeIsNotExist:
+    def update_challenge(self, challenge: Challenge) -> bool or ChallengeIsNotExistException:
         with self._session_scope() as s:
             not_updated_challenge: Challenge = s.query(Challenge).filter(Challenge.id == challenge.id).one_or_none()
             if not_updated_challenge is None:
-                raise ChallengeIsNotExist
+                raise ChallengeIsNotExistException
             not_updated_challenge.sub_category_fk = challenge.sub_category_fk
             not_updated_challenge.name = challenge.name
             not_updated_challenge.photo_url = challenge.photo_url
@@ -220,19 +221,19 @@ class Database(metaclass=Singleton):
             s.add(sub_category)
         return True
 
-    def get_sub_category(self, sub_category_id: int) -> SubCategory or SubCategoryIsNotExist:
+    def get_sub_category(self, sub_category_id: int) -> SubCategory or SubCategoryIsNotExistException:
         with self._session_scope() as s:
             check_subcategory = s.query(SubCategory).filter(SubCategory.id == sub_category_id).one_or_none()
             if check_subcategory is None:
-                raise SubCategoryIsNotExist
+                raise SubCategoryIsNotExistException
         return check_subcategory
 
-    def update_sub_category(self, sub_category: SubCategory) -> bool or SubCategoryIsNotExist:
+    def update_sub_category(self, sub_category: SubCategory) -> bool or SubCategoryIsNotExistException:
         with self._session_scope() as s:
             not_updated_subcategory: SubCategory = s.query(SubCategory).filter(
                 SubCategory.id == sub_category.id).one_or_none()
             if not_updated_subcategory is None:
-                raise SubCategoryIsNotExist
+                raise SubCategoryIsNotExistException
             not_updated_subcategory.category_fk = sub_category.category_fk
             not_updated_subcategory.name = sub_category.name
             not_updated_subcategory.description = sub_category.description
@@ -249,19 +250,19 @@ class Database(metaclass=Singleton):
             s.add(category)
         return True
 
-    def get_category(self, category_id: int) -> Category or CategoryIsNotExist:
+    def get_category(self, category_id: int) -> Category or CategoryIsNotExistException:
         with self._session_scope() as s:
             check_category = s.query(Category).filter(Category.id == category_id).one_or_none()
             if check_category is None:
-                raise CategoryIsNotExist
+                raise CategoryIsNotExistException
         return check_category
 
-    def update_category(self, category: Category) -> bool or CategoryIsNotExist:
+    def update_category(self, category: Category) -> bool or CategoryIsNotExistException:
         with self._session_scope() as s:
             not_updated_category: Category = s.query(Category).filter(
                 Category.id == category.id).one_or_none()
             if not_updated_category is None:
-                raise SubCategoryIsNotExist
+                raise SubCategoryIsNotExistException
             not_updated_category.name = category.name
             not_updated_category.description = category.description
             not_updated_category.color = category.color
@@ -270,3 +271,14 @@ class Database(metaclass=Singleton):
         with self._session_scope() as s:
             categories = s.query(Category).join(SubCategory).join(Item).filter(Item.user_fk == user_id).all()
         return categories
+
+    def unapply_user(self, user_id, challenge_id) -> bool or DatabaseException:
+        with self._session_scope() as s:
+            user = s.query(User).filter(User.id == user_id).one_or_none()
+            if user is None:
+                raise UserIsNotExistException
+            challenge = s.query(Challenge).filter(Challenge.id == challenge_id).one_or_none()
+            if challenge is None:
+                raise ChallengeIsNotExistException
+            user.challenges.remove(challenge)
+        return True
