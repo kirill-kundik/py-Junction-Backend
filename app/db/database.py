@@ -313,3 +313,10 @@ class Database(metaclass=Singleton):
                         wish_list_to_challenge.c.user_fk == user.id))
         conn.execute(stmt)
         return True
+
+    def get_wish_list_by_user_and_challenge(self, challenge_id: int, user_fk: int) -> List[WishList]:
+        with self._session_scope() as s:
+            items = s.query(WishList).join(wish_list_to_challenge).filter(
+                and_(wish_list_to_challenge.c.user_fk == user_fk,
+                     wish_list_to_challenge.c.challenge_fk == challenge_id)).all()
+        return items
