@@ -19,8 +19,8 @@ def apply(challenge_id, from_user):
         user: User = app.db.get_user_by_id(from_user["id"])
         user.challenges.append(app.db.get_challenge_by_id(challenge_id))
         app.db.update_user(user)
-    except DatabaseException as e:
-        return e, 404
+    except DatabaseException:
+        return NoContent, 404
     return NoContent, 200
 
 

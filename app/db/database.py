@@ -77,7 +77,7 @@ class Database(metaclass=Singleton):
 
     def get_wish_list_item(self, item_id: int) -> WishList or WishListItemIsNotExistException:
         with self._session_scope() as s:
-            check_item = s.query(WishList).filter(WishList.id == item_id).one_or_nonne()
+            check_item = s.query(WishList).filter(WishList.id == item_id).one_or_none()
             if check_item is None:
                 raise WishListItemIsNotExistException
         return check_item
@@ -149,7 +149,9 @@ class Database(metaclass=Singleton):
 
     def get_user_items(self, user_id: int) -> List[Item]:
         with self._session_scope() as s:
-            items = s.query(Item).filter(Item.user_fk == user_id).all()
+            items = s.query(Item).join(SubCategory) \
+                .options(subqueryload(Item.sub_category)) \
+                .filter(Item.user_fk == user_id).all()
         return items
 
     def get_user_items_by_category(self, user_id: int, category_id: int) -> List[Item]:
