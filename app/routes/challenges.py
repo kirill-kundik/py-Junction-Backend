@@ -7,10 +7,11 @@ from app.db.models import User
 
 def get_all(from_user):
     challenges = app.db.get_challenges_by_user(from_user["id"])
+    applied_challenges_id = [challenge.id for challenge in challenges]
     recommended_challenges = app.db.get_recommended_challenges_by_user(from_user["id"])
 
     return [{**challenge.dump(), "applied": True} for challenge in challenges] + \
-           [challenge.dump() for challenge in recommended_challenges]
+           [challenge.dump() for challenge in recommended_challenges if challenge.id not in applied_challenges_id]
 
 
 def apply(challenge_id, from_user):
