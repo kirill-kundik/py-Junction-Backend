@@ -50,6 +50,14 @@ class Category(Base):
     description = Column(String)
     color = Column(String(10))
 
+    def dump(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "color": self.color,
+        }
+
 
 class SubCategory(Base):
     __tablename__ = "sub_category"
@@ -60,9 +68,19 @@ class SubCategory(Base):
     color = Column(String(10))
     period = Column(Enum(PeriodType))
 
-    category = relationship("Category")
+    category = relationship("Category", lazy='subquery')
 
     category_fk = Column(Integer, ForeignKey('category.id', onupdate='CASCADE', ondelete='RESTRICT'), nullable=False)
+
+    def dump(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "color": self.color,
+            "period": self.period.name,
+            "category": self.category.dump(),
+        }
 
 
 class Item(Base):
@@ -102,6 +120,18 @@ class Challenge(Base):
 
     sub_category_fk = Column(Integer, ForeignKey('sub_category.id', onupdate='CASCADE', ondelete='CASCADE'),
                              nullable=False)
+
+    def dump(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "photo_url": self.photo_url,
+            "full_description": self.full_description,
+            "brief_description": self.brief_description,
+            "earn_amount": self.earn_amount,
+            "difficulty": self.difficulty.name,
+            "sub_category": self.sub_category.dump(),
+        }
 
 
 class WishList(Base):
