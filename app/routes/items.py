@@ -15,6 +15,7 @@ def create(item):
     try:
         new_item = Item(**item)
         app.db.add_item(new_item)
+        item = app.db.get_item(new_item.id)
     except DatabaseException:
         return NoContent, 404
-    return new_item.dump()
+    return item.dump()
