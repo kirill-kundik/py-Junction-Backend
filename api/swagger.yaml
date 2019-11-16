@@ -1,8 +1,8 @@
 swagger: '2.0'
 info:
-  title: Pet Shop Example API
+  title: Junction 2019 Flashback team API
   version: "0.1"
-  description: Simple example API to store and retrieve pets
+  description: Junction 2019 Flashback team API
 consumes:
   - application/json
 produces:
@@ -42,7 +42,7 @@ paths:
         - in: body
           name: from_user
           schema:
-            $ref: "#/definitions/FromUserRequest"
+            $ref: "#/definitions/ChallengeApplyRequest"
       responses:
         default:
           description: Return updated challenge
@@ -149,6 +149,14 @@ paths:
 
 
 definitions:
+  ChallengeApplyRequest:
+    type: object
+    properties:
+      id:
+        type: number
+      wishlist_id:
+        type: number
+    required: [id]
   FromUserRequest:
     type: object
     properties:
