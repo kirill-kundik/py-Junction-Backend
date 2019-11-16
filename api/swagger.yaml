@@ -68,7 +68,7 @@ paths:
             $ref: "#/definitions/Challenge"
   /whishlist/all:
     get:
-      tags: [Whishlist]
+      tags: [Wishlist]
       operationId: app.wishlist.get_all
       parameters:
         - in: body
@@ -87,7 +87,7 @@ paths:
       operationId: app.wishlist.create
       parameters:
         - in: body
-          name: body
+          name: wishlist_item
           schema:
             $ref: "#/definitions/WishlistCreateRequest"
       responses:
@@ -137,6 +137,11 @@ definitions:
     properties:
       userId:
         type: number
+      name:
+        type: string
+      price:
+        type: number
+    required: [userId, name]
 
 
 
