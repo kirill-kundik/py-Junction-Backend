@@ -6,8 +6,8 @@ from app.db.exceptions import DatabaseException
 
 
 def create(wishlist_item):
-    app.db.add_wish_list_item(WishList(**wishlist_item))
-    return NoContent, 200
+    item = app.db.add_wish_list_item(WishList(**wishlist_item))
+    return item.dump()
 
 
 def delete(item_id):
