@@ -147,6 +147,18 @@ paths:
             items:
               $ref:  "#/definitions/Item"
 
+  /subcategories/all:
+    get:
+      tags: [Subcategories]
+      operationId: app.subcategories.get_all
+      responses:
+        default:
+          description: Get all subcategories
+          schema:
+            type: array
+            items:
+              $ref:  "#/definitions/Subcategory"
+
 
 definitions:
   ChallengeApplyRequest:
@@ -203,6 +215,8 @@ definitions:
       description:
         type: string
     required: [price, amount, name, date, sub_category_fk, user_fk]
+  Subcategory:
+    type: object
 
 
 
