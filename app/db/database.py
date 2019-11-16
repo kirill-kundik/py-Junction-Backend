@@ -66,8 +66,8 @@ class Database(metaclass=Singleton):
             not_updated_user.items = user.items
             not_updated_user.pass_hash = user.pass_hash
             not_updated_user.photo_url = user.photo_url
-            not_updated_user.wish_list = user.wish_list
-            not_updated_user.challenges = user.challenges
+            # not_updated_user.wish_list = user.wish_list
+            # not_updated_user.challenges = user.challenges
         return True
 
     def add_wish_list_item(self, item: WishList) -> bool:
@@ -173,7 +173,9 @@ class Database(metaclass=Singleton):
 
     def get_challenge_by_id(self, challenge_id: int) -> Challenge or ChallengeIsNotExistException:
         with self._session_scope() as s:
-            check_challenge = s.query(Challenge).filter(Challenge.id == challenge_id).one_or_none()
+            check_challenge = s.query(Challenge)\
+                .options(subqueryload(Challenge.sub_category)) \
+                .filter(Challenge.id == challenge_id).one_or_none()
             if check_challenge is None:
                 raise ChallengeIsNotExistException
         return check_challenge
@@ -289,4 +291,15 @@ class Database(metaclass=Singleton):
             if challenge is None:
                 raise ChallengeIsNotExistException
             user.challenges.remove(challenge)
+        return True
+
+    def apply_user(self, user_id, challenge_id) -> bool or DatabaseException:
+        with self._session_scope() as s:
+            user = s.query(User).filter(User.id == user_id).one_or_none()
+            if user is None:
+                raise UserIsNotExistException
+            challenge = s.query(Challenge).filter(Challenge.id == challenge_id).one_or_none()
+            if challenge is None:
+                raise ChallengeIsNotExistException
+            user.challenges.append(challenge)
         return True
