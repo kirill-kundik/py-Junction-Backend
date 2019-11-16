@@ -203,6 +203,13 @@ class Database(metaclass=Singleton):
                 .filter(User.id == user_id).all()
         return challenges
 
+    def get_recommended_challenges_by_user(self, user_id: int) -> List[Challenge]:
+        with self._session_scope() as s:
+            challenges = s.query(Challenge).join(recommended_challenges).join(User).join(SubCategory) \
+                .options(subqueryload(Challenge.sub_category)) \
+                .filter(User.id == user_id).all()
+        return challenges
+
     def get_challenges_by_user_and_category(self, user_id: int, category_id: int) -> List[Challenge]:
         with self._session_scope() as s:
             challenges = s.query(Challenge).join(wish_list_to_challenge).join(WishList).join(

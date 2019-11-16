@@ -7,8 +7,10 @@ from app.db.models import User
 
 def get_all(from_user):
     challenges = app.db.get_challenges_by_user(from_user["id"])
+    recommended_challenges = app.db.get_recommended_challenges_by_user(from_user["id"])
 
-    return [challenge.dump() for challenge in challenges]
+    return [{**challenge.dump(), "applied": True} for challenge in challenges] + \
+           [challenge.dump() for challenge in recommended_challenges]
 
 
 def apply(challenge_id, from_user):
