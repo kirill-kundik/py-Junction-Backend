@@ -171,3 +171,13 @@ class WishList(Base):
     )
 
     user_fk = Column(Integer, ForeignKey('user.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=False)
+
+    def dump(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "photo_url": self.photo_url,
+            "amount": self.amount,
+            "price": self.price,
+            "description": self.description,
+        }

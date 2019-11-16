@@ -72,7 +72,7 @@ paths:
       operationId: app.wishlist.get_all
       parameters:
         - in: body
-          name: body
+          name: from_user
           schema:
             $ref: "#/definitions/FromUserRequest"
       responses:
@@ -98,19 +98,15 @@ paths:
             items:
               $ref:  "#/definitions/Wishlist"
 
-  /wishlist/{id}:
+  /wishlist/{item_id}:
     delete:
       tags: [Wishlist]
       operationId: app.wishlist.delete
       parameters:
         - in: path
-          name: id
+          name: item_id
           type: string
           required: true
-        - in: body
-          name: body
-          schema:
-            $ref: "#/definitions/FromUserRequest"
       responses:
         default:
           description: Delete a wishlist item
@@ -135,13 +131,19 @@ definitions:
   WishlistCreateRequest:
     type: object
     properties:
-      userId:
-        type: number
       name:
         type: string
       price:
         type: number
-    required: [userId, name]
+      user_fk:
+        type: number
+      photo_url:
+        type: string
+      amount:
+        type: number
+      description:
+        type: string
+    required: [user_fk, name, price]
 
 
 
