@@ -55,7 +55,7 @@ class SubCategory(Base):
     __tablename__ = "sub_category"
 
     id = Column(Integer, primary_key=True)
-    name = Column(String(255), nullable=False, unique=True)
+    name = Column(String(255), nullable=False)
     description = Column(String)
     color = Column(String(10))
     period = Column(Enum(PeriodType))
@@ -70,7 +70,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     price = Column(Numeric, nullable=False)
-    amount = Column(Integer, nullable=False)
+    amount = Column(Numeric, nullable=False)
     name = Column(String, nullable=False)
     date = Column(DateTime, nullable=False)
     description = Column(String)
