@@ -15,6 +15,14 @@ wish_list_to_challenge = Table(
     Column('user_fk', Integer, ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
 )
 
+recommended_challenges = Table(
+    'recommended_challenges',
+    Base.metadata,
+    Column('challenge_fk', Integer, ForeignKey('challenge.id', onupdate='CASCADE', ondelete='RESTRICT'),
+           nullable=False),
+    Column('user_fk', Integer, ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+)
+
 
 class PeriodType(enum.Enum):
     daily = 0
@@ -45,6 +53,11 @@ class User(Base):
     challenges = relationship(
         "Challenge",
         secondary=wish_list_to_challenge,
+        lazy='subquery',
+    )
+    recommended_challenges = relationship(
+        "Challenge",
+        secondary=recommended_challenges,
         lazy='subquery',
     )
 
