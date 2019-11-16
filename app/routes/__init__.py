@@ -1,1 +1,1 @@
-from . import challenges, wishlist, items
+from . import challenges, wishlist, items, subcategories
