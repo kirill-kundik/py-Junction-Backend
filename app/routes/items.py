@@ -15,9 +15,11 @@ def get_all(from_user):
 
 def create(item):
     try:
-        app.db.add_item(Item(**item))
+        new_item = Item(**item)
+        app.db.add_item(new_item)
+        item = app.db.get_item(new_item.id)
         if random.randint(0, 10) < 3:
             create_challenge_on_item_add(item)
     except DatabaseException:
         return NoContent, 404
-    return NoContent, 200
+    return item.dump()

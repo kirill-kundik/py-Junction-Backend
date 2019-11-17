@@ -332,3 +332,8 @@ class Database(metaclass=Singleton):
             sum_costs = s.query(func.sum(Item.price * Item.amount)).filter(
                 and_(Item.user_fk == user_id, Item.date >= period_first_day)).first()[0]
         return sum_costs
+
+    def get_all_subcategories(self) -> List[SubCategory]:
+        with self._session_scope() as s:
+            subcategories = s.query(SubCategory).all()
+        return subcategories
