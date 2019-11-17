@@ -13,7 +13,8 @@ def get_all(from_user):
                [challenge.dump() for challenge in recommended_challenges if challenge.id not in applied_challenges_id]
     return [{
         **item,
-        "wishlist": [item.dump() for item in app.db.get_wish_list_by_user_and_challenge(item["id"], from_user["id"])]
+        "wishlist": [{**i.dump(), **app.db.generate_wishlist_progress(from_user["id"], item["id"], i.id)} for i in
+                     app.db.get_wish_list_by_user_and_challenge(item["id"], from_user["id"])]
     } for item in response]
 
 
