@@ -25,6 +25,8 @@ def create_challenge_on_item_add(item: Item):
     save_amount = period_expense_sum / parts_count
     name = f"Save on your {item.name}!"
     challenge = Challenge(name=name,
+                          photo_url="https://previews.123rf.com/images/bankrx/bankrx1704/bankrx170400106/"
+                                    "75490316-grunge-red-challenge-with-star-icon-round-rubber-seal-stamp.jpg",
                           full_description=get_random_description(item.sub_category.name),
                           brief_description=get_random_short_description(),
                           earn_amount=float(str(f"{save_amount:.2f}")),
@@ -33,7 +35,6 @@ def create_challenge_on_item_add(item: Item):
     app.db.add_challenge(challenge)
     user.recommended_challenges.append(challenge)
     app.db.update_user(user)
-
 
 # if __name__ == "__main__":
 #     for item in app.db.get_user_items(1):
