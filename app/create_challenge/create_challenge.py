@@ -23,7 +23,7 @@ def create_challenge_on_item_add(item: Item):
     start_day = datetime.datetime.today() - datetime.timedelta(days=number_of_days)
     period_expense_sum = app.db.get_user_items_sum_by_period(user.id, start_day)
     save_amount = period_expense_sum / parts_count
-    name = f"Save {save_amount:.2f} EUR on your {item.name} expenses {period.next.name}!"
+    name = f"Save on your {item.name}!"
     challenge = Challenge(name=name,
                           full_description=get_random_description(item.sub_category.name),
                           brief_description=get_random_short_description(),
@@ -36,7 +36,7 @@ def create_challenge_on_item_add(item: Item):
     # app.db.update_user(user)
 
 
-if __name__ == "__main__":
-    for item in app.db.get_user_items(1):
-        # print(item.name)
-        create_challenge_on_item_add(item)
+# if __name__ == "__main__":
+#     for item in app.db.get_user_items(1):
+#         print(item.name)
+#         create_challenge_on_item_add(item)
