@@ -1,3 +1,4 @@
+import datetime
 import enum
 
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, String, Table
@@ -12,7 +13,8 @@ wish_list_to_challenge = Table(
     Column('wish_list_fk', Integer, ForeignKey('wish_list.id', onupdate='CASCADE', ondelete='CASCADE'), nullable=True),
     Column('challenge_fk', Integer, ForeignKey('challenge.id', onupdate='CASCADE', ondelete='RESTRICT'),
            nullable=False),
-    Column('user_fk', Integer, ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False)
+    Column('user_fk', Integer, ForeignKey('user.id', ondelete='CASCADE', onupdate='CASCADE'), nullable=False),
+    Column('created_at', DateTime, default=datetime.datetime.utcnow())
 )
 
 recommended_challenges = Table(
