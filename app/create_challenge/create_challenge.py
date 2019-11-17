@@ -22,7 +22,7 @@ def create_challenge_on_item_add(item: Item):
     parts_count, number_of_days = get_parts_count_by_sub_category(period)
     start_day = datetime.datetime.today() - datetime.timedelta(days=number_of_days)
     period_expense_sum = app.db.get_user_items_sum_by_period(user.id, start_day)
-    save_amount = period_expense_sum / parts_count
+    save_amount = period_expense_sum / parts_count / 10
     name = f"Save on your {item.name}!"
     challenge = Challenge(name=name,
                           photo_url="https://previews.123rf.com/images/bankrx/bankrx1704/bankrx170400106/"
