@@ -351,5 +351,32 @@ class Database(metaclass=Singleton):
         stmt = recommended_challenges.insert().values(user_fk=user_fk, challenge_fk=challenge_fk)
         conn.execute(stmt)
 
-# if __name__ == "__main__":
-#     print(Database().get_pie_chart_data(2))
+    def generate_wishlist_progress(self, user_id: int, challenge_id: int, wishlist_id: int):
+        with self._session_scope() as s:
+            total_amount, created_at, sub_category_id = s.query(WishList.amount, wish_list_to_challenge.c.created_at,
+                                                                Challenge.sub_category_fk) \
+                .join(wish_list_to_challenge, WishList.id == wish_list_to_challenge.c.wish_list_fk) \
+                .join(Challenge, Challenge.id == wish_list_to_challenge.c.challenge_fk) \
+                .filter(and_(wish_list_to_challenge.c.wish_list_fk == wishlist_id,
+                             and_(wish_list_to_challenge.c.user_fk == user_id,
+                                  wish_list_to_challenge.c.challenge_fk == challenge_id))).first()
+            sum_costs = s.query(func.sum(Item.price * Item.amount)) \
+                .filter(and_(and_(Item.user_fk == user_id, Item.date >= created_at)),
+                        Item.sub_category_fk == sub_category_id).first()[0]
+            dt = datetime.datetime.utcnow() - created_at
+            sub_category_period = s.query(SubCategory.period).filter(SubCategory.id == sub_category_id).first()[0]
+            if sub_category_period == PeriodType.daily:
+                sub_category_period = 86400
+            elif sub_category_period == PeriodType.weekly:
+                sub_category_period = 7 * 86400
+            elif sub_category_period == PeriodType.monthly:
+                sub_category_period = 30 * 86400
+            elif sub_category_period == PeriodType.half_yearly:
+                sub_category_period = 182 * 86400
+            elif sub_category_period == PeriodType.yearly:
+                sub_category_period = 365 * 86400
+        return {
+            "created_at": created_at,
+            "challenge_price_progress": sum_costs / total_amount,
+            "challenge_time_progress": dt.seconds / sub_category_period,
+        }
