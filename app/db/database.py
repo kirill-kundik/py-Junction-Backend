@@ -1,10 +1,12 @@
+import datetime
 from contextlib import contextmanager
 from typing import List
 
-from sqlalchemy import and_, create_engine, func, or_
+from sqlalchemy import and_, create_engine, extract, func, or_
 from sqlalchemy.orm import sessionmaker, subqueryload
 
 import app
+from app.misc.date_helpers import get_all_months
 from app.utilities import Singleton
 from .exceptions import *
 from .models import *
@@ -345,6 +347,30 @@ class Database(metaclass=Singleton):
                 .join(Category, SubCategory.category_fk == Category.id).group_by(
                 Category.name).filter(Item.user_fk == user_id).all()
         return result
+
+    def get_bar_chart_data(self, user_id: int, sub_category_id=None, category_id=None):
+        months = get_all_months()
+        values = [0 for _ in range(len(months))]
+        with self._session_scope() as s:
+            for i in range(len(values)):
+                month_num, month_name = months[i]
+                result = s.query(func.sum(Item.price * Item.amount)) \
+                    .join(SubCategory, Item.sub_category_fk == SubCategory.id) \
+                    .filter(
+                    and_(extract("month", Item.date) == month_num,
+                         extract("year", Item.date) == datetime.datetime.utcnow().year)) \
+                    .filter(Item.user_fk == user_id)
+                if sub_category_id is not None:
+                    result = result.filter(SubCategory.id == sub_category_id)
+                elif category_id is not None:
+                    result = result.join(Category, SubCategory.category_fk == Category.id) \
+                                 .filter(Category.id == category_id)
+                else:
+                    raise ValueError("No category or subcategory id provided")
+                result = result.one_or_none()[0]
+                values[i] = result if result is not None else 0
+        months = map(lambda e: e[1], months)  # select only month names
+        return tuple(months), tuple(values)
 
     def add_user_recommended_challenge(self, user_fk: int, challenge_fk: int):
         conn = self.engine.connect()
