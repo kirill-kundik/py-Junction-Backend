@@ -362,7 +362,9 @@ class Database(metaclass=Singleton):
                                   wish_list_to_challenge.c.challenge_fk == challenge_id))).first()
             sum_costs = s.query(func.sum(Item.price * Item.amount)) \
                 .filter(and_(and_(Item.user_fk == user_id, Item.date >= created_at)),
-                        Item.sub_category_fk == sub_category_id).first()[0]
+                        Item.sub_category_fk == sub_category_id).one_or_none()[0]
+            if sum_costs is None:
+                sum_costs = 0
             dt = datetime.datetime.utcnow() - created_at
             sub_category_period = s.query(SubCategory.period).filter(SubCategory.id == sub_category_id).first()[0]
             if sub_category_period == PeriodType.daily:
