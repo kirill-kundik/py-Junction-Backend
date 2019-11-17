@@ -8,4 +8,4 @@ RUN pip3 install -e .
 ARG APP_PORT
 EXPOSE $APP_PORT
 
-CMD alembic upgrade head && gunicorn -w 4 -b 0.0.0.0:$APP_PORT "main:application"
+CMD alembic upgrade head && gunicorn -w 8 -b 0.0.0.0:$APP_PORT "main:application"

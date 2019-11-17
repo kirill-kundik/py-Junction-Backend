@@ -1,13 +1,13 @@
 from contextlib import contextmanager
 from typing import List
 
-from sqlalchemy import create_engine, or_, and_
+from sqlalchemy import and_, create_engine, func, or_
 from sqlalchemy.orm import sessionmaker, subqueryload
 
 import app
-from .models import *
-from .exceptions import *
 from app.utilities import Singleton
+from .exceptions import *
+from .models import *
 
 
 class Database(metaclass=Singleton):
@@ -63,9 +63,10 @@ class Database(metaclass=Singleton):
                 raise UserIsNotExistException
             not_updated_user.username = user.username
             not_updated_user.email = user.email
-            not_updated_user.items = user.items
+            # not_updated_user.items = user.items
             not_updated_user.pass_hash = user.pass_hash
             not_updated_user.photo_url = user.photo_url
+            not_updated_user.recommended_challenges = user.recommended_challenges
             # not_updated_user.wish_list = user.wish_list
             # not_updated_user.challenges = user.challenges
         return True
@@ -321,7 +322,34 @@ class Database(metaclass=Singleton):
                      wish_list_to_challenge.c.challenge_fk == challenge_id)).all()
         return items
 
+    def get_user_items_count(self, user_id: int) -> int:
+        with self._session_scope() as s:
+            count = s.query(Item).filter(Item.user_fk == user_id).count()
+        return count
+
+    def get_user_items_sum_by_period(self, user_id: int, period_first_day):
+        with self._session_scope() as s:
+            sum_costs = s.query(func.sum(Item.price * Item.amount)).filter(
+                and_(Item.user_fk == user_id, Item.date >= period_first_day)).first()[0]
+        return sum_costs
+
     def get_all_subcategories(self) -> List[SubCategory]:
         with self._session_scope() as s:
             subcategories = s.query(SubCategory).all()
         return subcategories
+
+    def get_pie_chart_data(self, user_id: int):
+        with self._session_scope() as s:
+            result = s.query(func.sum(Item.price * Item.amount), Category.name) \
+                .join(SubCategory, Item.sub_category_fk == SubCategory.id) \
+                .join(Category, SubCategory.category_fk == Category.id).group_by(
+                Category.name).filter(Item.user_fk == user_id).all()
+        return result
+
+    def add_user_recommended_challenge(self, user_fk: int, challenge_fk: int):
+        conn = self.engine.connect()
+        stmt = recommended_challenges.insert().values(user_fk=user_fk, challenge_fk=challenge_fk)
+        conn.execute(stmt)
+
+# if __name__ == "__main__":
+#     print(Database().get_pie_chart_data(2))
