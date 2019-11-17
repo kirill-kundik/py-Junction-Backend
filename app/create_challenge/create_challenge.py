@@ -2,6 +2,7 @@ import datetime
 
 import app
 from app.db.models import Challenge, ChallengeDifficulty, Item, PeriodType, User
+from .challenge_descriptions import get_random_description, get_random_short_description
 
 
 def get_parts_count_by_sub_category(period: PeriodType) -> (int, int):
@@ -24,8 +25,8 @@ def create_challenge_on_item_add(item: Item):
     save_amount = period_expense_sum / parts_count
     name = f"Save {save_amount:.2f} EUR on your {item.name} expenses {period.next.name}!"
     challenge = Challenge(name=name,
-                          full_description=name,
-                          brief_description=name,
+                          full_description=get_random_description(item.sub_category.name),
+                          brief_description=get_random_short_description(),
                           earn_amount=float(str(f"{save_amount:.2f}")),
                           difficulty=ChallengeDifficulty.easy,
                           sub_category_fk=item.sub_category.id)
