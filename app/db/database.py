@@ -351,15 +351,14 @@ class Database(metaclass=Singleton):
         stmt = recommended_challenges.insert().values(user_fk=user_fk, challenge_fk=challenge_fk)
         conn.execute(stmt)
 
-    def generate_wishlist_progress(self, user_id: int, challenge_id: int, wishlist_id: int):
+    def generate_challenge_progress(self, user_id: int, challenge_id: int):
         with self._session_scope() as s:
-            total_amount, created_at, sub_category_id = s.query(WishList.amount, wish_list_to_challenge.c.created_at,
+            total_amount, created_at, sub_category_id = s.query(Challenge.earn_amount,
+                                                                wish_list_to_challenge.c.created_at,
                                                                 Challenge.sub_category_fk) \
-                .join(wish_list_to_challenge, WishList.id == wish_list_to_challenge.c.wish_list_fk) \
-                .join(Challenge, Challenge.id == wish_list_to_challenge.c.challenge_fk) \
-                .filter(and_(wish_list_to_challenge.c.wish_list_fk == wishlist_id,
-                             and_(wish_list_to_challenge.c.user_fk == user_id,
-                                  wish_list_to_challenge.c.challenge_fk == challenge_id))).first()
+                .join(wish_list_to_challenge) \
+                .filter(and_(wish_list_to_challenge.c.user_fk == user_id,
+                             wish_list_to_challenge.c.challenge_fk == challenge_id)).first()
             sum_costs = s.query(func.sum(Item.price * Item.amount)) \
                 .filter(and_(and_(Item.user_fk == user_id, Item.date >= created_at)),
                         Item.sub_category_fk == sub_category_id).one_or_none()[0]
