@@ -11,7 +11,7 @@ def get_random_description(subcategory_name: str) -> str:
                     f"We have detected your high spending on {subcategory_name}. "
                     f"And we think you may change it. "
                     f"Accept the challenge and save money for something nice! "]
-    rand_index = random.randint(0, len(descriptions))
+    rand_index = random.randint(0, len(descriptions) - 1)
     return descriptions[rand_index]
 
 
@@ -19,5 +19,5 @@ def get_random_short_description() -> str:
     descriptions = ["Save your money for something you wish to buy!",
                     "Help yourself to become financially healthier by completing this challenge!",
                     "Don't hesitate to challenge yourself!"]
-    rand_index = random.randint(0, len(descriptions))
+    rand_index = random.randint(0, len(descriptions) - 1)
     return descriptions[rand_index]
