@@ -158,6 +158,22 @@ paths:
             type: array
             items:
               $ref:  "#/definitions/Subcategory"
+  /data/piechart:
+    post:
+      tags: [Charts]
+      operationId: app.charts.get_pie_chart_data
+      parameters:
+        - in: body
+          name: from_user
+          schema:
+            $ref: "#/definitions/FromUserRequest"
+      responses:
+        default:
+          description: Get all pie chart data for user
+          schema:
+            type: array
+            items:
+              $ref:  "#/definitions/PieChartData"
 
 
 definitions:
@@ -216,6 +232,8 @@ definitions:
         type: string
     required: [price, amount, name, date, sub_category_fk, user_fk]
   Subcategory:
+    type: object
+  PieChartData:
     type: object
 
 

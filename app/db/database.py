@@ -338,7 +338,18 @@ class Database(metaclass=Singleton):
             subcategories = s.query(SubCategory).all()
         return subcategories
 
+    def get_pie_chart_data(self, user_id: int):
+        with self._session_scope() as s:
+            result = s.query(func.sum(Item.price * Item.amount), Category.name) \
+                .join(SubCategory, Item.sub_category_fk == SubCategory.id) \
+                .join(Category, SubCategory.category_fk == Category.id).group_by(
+                Category.name).filter(Item.user_fk == user_id).all()
+        return result
+
     def add_user_recommended_challenge(self, user_fk: int, challenge_fk: int):
         conn = self.engine.connect()
         stmt = recommended_challenges.insert().values(user_fk=user_fk, challenge_fk=challenge_fk)
         conn.execute(stmt)
+
+# if __name__ == "__main__":
+#     print(Database().get_pie_chart_data(2))
